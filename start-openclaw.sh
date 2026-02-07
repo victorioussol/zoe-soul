@@ -258,6 +258,7 @@ if (process.env.OPENROUTER_API_KEY) {
         models: [
             { id: 'anthropic/claude-opus-4-5', name: 'Claude Opus', contextWindow: 200000, maxTokens: 8192 },
             { id: 'anthropic/claude-sonnet-4-5', name: 'Claude Sonnet', contextWindow: 200000, maxTokens: 8192 },
+            { id: 'deepseek/deepseek-chat', name: 'DeepSeek V3', contextWindow: 64000, maxTokens: 8192 },
             { id: 'deepseek/deepseek-reasoner', name: 'DeepSeek R1', reasoning: true, contextWindow: 64000, maxTokens: 8192 },
             { id: 'google/gemini-2.5-flash-lite', name: 'Gemini Flash Lite', contextWindow: 128000, maxTokens: 8192 },
             { id: 'google/gemini-3-flash', name: 'Gemini 3 Flash', input: ['text', 'image'], contextWindow: 128000, maxTokens: 8192 },
@@ -267,31 +268,34 @@ if (process.env.OPENROUTER_API_KEY) {
     config.agents = config.agents || {};
     config.agents.defaults = config.agents.defaults || {};
 
-    // Primary model: Opus for heavy reasoning, fallbacks for resilience
+    // Primary model: DeepSeek V3 is ~$0.53/M tokens — handles most queries well.
+    // Opus ($30/M) is available via /model opus when heavy reasoning is needed.
     config.agents.defaults.model = {
-        primary: 'openrouter/anthropic/claude-opus-4-5',
+        primary: 'openrouter/deepseek/deepseek-chat',
         fallbacks: [
-            'openrouter/deepseek/deepseek-reasoner',
             'openrouter/google/gemini-3-flash',
+            'openrouter/anthropic/claude-sonnet-4-5',
         ],
     };
 
-    // Model aliases for /model command
+    // Model aliases for /model command — switch to Opus on demand
     config.agents.defaults.models = {
         'openrouter/anthropic/claude-opus-4-5': { alias: 'opus' },
         'openrouter/anthropic/claude-sonnet-4-5': { alias: 'sonnet' },
+        'openrouter/deepseek/deepseek-chat': { alias: 'ds' },
+        'openrouter/deepseek/deepseek-reasoner': { alias: 'r1' },
         'openrouter/google/gemini-3-flash': { alias: 'flash' },
-        'openrouter/deepseek/deepseek-reasoner': { alias: 'ds' },
+        'openrouter/google/gemini-2.5-flash-lite': { alias: 'lite' },
     };
 
-    // Cheap model for periodic heartbeats
+    // Cheap model for periodic heartbeats (~$0.50/M tokens)
     config.agents.defaults.heartbeat = {
         every: '30m',
         model: 'openrouter/google/gemini-2.5-flash-lite',
         target: 'last',
     };
 
-    // Cost-effective model for sub-agents
+    // Cost-effective model for sub-agents (~$2.74/M tokens)
     config.agents.defaults.subagents = {
         model: 'openrouter/deepseek/deepseek-reasoner',
         maxConcurrent: 1,
@@ -306,7 +310,7 @@ if (process.env.OPENROUTER_API_KEY) {
 
     config.agents.defaults.contextTokens = 200000;
 
-    console.log('OpenRouter multi-model config applied: primary=opus, heartbeat=gemini-flash-lite, subagents=deepseek-reasoner');
+    console.log('OpenRouter multi-model config applied: primary=deepseek-v3, heartbeat=gemini-flash-lite, subagents=deepseek-r1');
 }
 
 // Telegram configuration

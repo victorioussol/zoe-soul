@@ -33,7 +33,7 @@ RUN mkdir -p /root/.openclaw \
 
 # Copy startup script
 # Cache bust: changing ARG value forces rebuild of all layers below
-ARG CACHE_BUST=2026-02-07-v30-openrouter-support
+ARG CACHE_BUST=2026-02-07-v31-deepseek-primary
 COPY start-openclaw.sh /usr/local/bin/start-openclaw.sh
 RUN chmod +x /usr/local/bin/start-openclaw.sh
 
