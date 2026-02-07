@@ -261,17 +261,17 @@ if (process.env.OPENROUTER_API_KEY) {
             { id: 'deepseek/deepseek-chat', name: 'DeepSeek V3', contextWindow: 64000, maxTokens: 8192 },
             { id: 'deepseek/deepseek-reasoner', name: 'DeepSeek R1', reasoning: true, contextWindow: 64000, maxTokens: 8192 },
             { id: 'google/gemini-2.5-flash-lite', name: 'Gemini Flash Lite', contextWindow: 128000, maxTokens: 8192 },
-            { id: 'google/gemini-3-flash', name: 'Gemini 3 Flash', input: ['text', 'image'], contextWindow: 128000, maxTokens: 8192 },
+            { id: 'google/gemini-2.5-flash', name: 'Gemini 2.5 Flash', input: ['text', 'image'], contextWindow: 1000000, maxTokens: 8192 },
         ],
     };
 
     config.agents = config.agents || {};
     config.agents.defaults = config.agents.defaults || {};
 
-    // Primary model: Gemini 3 Flash is ~$0.10/$0.40 per M tokens — fast, multimodal, great for daily use.
+    // Primary model: Gemini 2.5 Flash is ~$0.30/$2.50 per M tokens — stable, multimodal, great for daily use.
     // Opus ($15/$75 per M) is available via /model opus when heavy reasoning is needed.
     config.agents.defaults.model = {
-        primary: 'openrouter/google/gemini-3-flash',
+        primary: 'openrouter/google/gemini-2.5-flash',
         fallbacks: [
             'openrouter/deepseek/deepseek-chat',
             'openrouter/anthropic/claude-sonnet-4-5',
@@ -284,7 +284,7 @@ if (process.env.OPENROUTER_API_KEY) {
         'openrouter/anthropic/claude-sonnet-4-5': { alias: 'sonnet' },
         'openrouter/deepseek/deepseek-chat': { alias: 'ds' },
         'openrouter/deepseek/deepseek-reasoner': { alias: 'r1' },
-        'openrouter/google/gemini-3-flash': { alias: 'flash' },
+        'openrouter/google/gemini-2.5-flash': { alias: 'flash' },
         'openrouter/google/gemini-2.5-flash-lite': { alias: 'lite' },
     };
 
@@ -304,13 +304,13 @@ if (process.env.OPENROUTER_API_KEY) {
 
     // Vision tasks use a multimodal model
     config.agents.defaults.imageModel = {
-        primary: 'openrouter/google/gemini-3-flash',
+        primary: 'openrouter/google/gemini-2.5-flash',
         fallbacks: ['openrouter/anthropic/claude-sonnet-4-5'],
     };
 
     config.agents.defaults.contextTokens = 128000;
 
-    console.log('OpenRouter multi-model config applied: primary=gemini-3-flash, heartbeat=gemini-flash-lite, subagents=deepseek-r1');
+    console.log('OpenRouter multi-model config applied: primary=gemini-2.5-flash, heartbeat=gemini-flash-lite, subagents=deepseek-r1');
 }
 
 // Telegram configuration
