@@ -268,12 +268,12 @@ if (process.env.OPENROUTER_API_KEY) {
     config.agents = config.agents || {};
     config.agents.defaults = config.agents.defaults || {};
 
-    // Primary model: DeepSeek V3 is ~$0.53/M tokens — handles most queries well.
-    // Opus ($30/M) is available via /model opus when heavy reasoning is needed.
+    // Primary model: Gemini 3 Flash is ~$0.10/$0.40 per M tokens — fast, multimodal, great for daily use.
+    // Opus ($15/$75 per M) is available via /model opus when heavy reasoning is needed.
     config.agents.defaults.model = {
-        primary: 'openrouter/deepseek/deepseek-chat',
+        primary: 'openrouter/google/gemini-3-flash',
         fallbacks: [
-            'openrouter/google/gemini-3-flash',
+            'openrouter/deepseek/deepseek-chat',
             'openrouter/anthropic/claude-sonnet-4-5',
         ],
     };
@@ -308,9 +308,9 @@ if (process.env.OPENROUTER_API_KEY) {
         fallbacks: ['openrouter/anthropic/claude-sonnet-4-5'],
     };
 
-    config.agents.defaults.contextTokens = 200000;
+    config.agents.defaults.contextTokens = 128000;
 
-    console.log('OpenRouter multi-model config applied: primary=deepseek-v3, heartbeat=gemini-flash-lite, subagents=deepseek-r1');
+    console.log('OpenRouter multi-model config applied: primary=gemini-3-flash, heartbeat=gemini-flash-lite, subagents=deepseek-r1');
 }
 
 // Telegram configuration
