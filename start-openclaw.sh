@@ -125,7 +125,10 @@ if [ ! -f "$CONFIG_FILE" ]; then
     echo "No existing config found, running openclaw onboard..."
 
     AUTH_ARGS=""
-    if [ -n "$CLOUDFLARE_AI_GATEWAY_API_KEY" ] && [ -n "$CF_AI_GATEWAY_ACCOUNT_ID" ] && [ -n "$CF_AI_GATEWAY_GATEWAY_ID" ]; then
+    if [ -n "$OPENROUTER_API_KEY" ]; then
+        # OpenRouter uses OpenAI-compatible API; onboard with a placeholder then patch config
+        AUTH_ARGS="--auth-choice openai-api-key --openai-api-key $OPENROUTER_API_KEY"
+    elif [ -n "$CLOUDFLARE_AI_GATEWAY_API_KEY" ] && [ -n "$CF_AI_GATEWAY_ACCOUNT_ID" ] && [ -n "$CF_AI_GATEWAY_GATEWAY_ID" ]; then
         AUTH_ARGS="--auth-choice cloudflare-ai-gateway-api-key \
             --cloudflare-ai-gateway-account-id $CF_AI_GATEWAY_ACCOUNT_ID \
             --cloudflare-ai-gateway-gateway-id $CF_AI_GATEWAY_GATEWAY_ID \
@@ -237,6 +240,73 @@ if (process.env.CF_AI_GATEWAY_MODEL) {
     } else {
         console.warn('CF_AI_GATEWAY_MODEL set but missing required config (account ID, gateway ID, or API key)');
     }
+}
+
+// OpenRouter multi-model configuration
+// When OPENROUTER_API_KEY is set, configure OpenRouter as a provider with
+// tiered model routing: Opus for primary, cheap models for heartbeats/subagents
+if (process.env.OPENROUTER_API_KEY) {
+    const orKey = process.env.OPENROUTER_API_KEY;
+
+    config.models = config.models || {};
+    config.models.mode = 'merge';
+    config.models.providers = config.models.providers || {};
+    config.models.providers['openrouter'] = {
+        baseUrl: 'https://openrouter.ai/api/v1',
+        apiKey: orKey,
+        api: 'openai-completions',
+        models: [
+            { id: 'anthropic/claude-opus-4-5', name: 'Claude Opus', contextWindow: 200000, maxTokens: 8192 },
+            { id: 'anthropic/claude-sonnet-4-5', name: 'Claude Sonnet', contextWindow: 200000, maxTokens: 8192 },
+            { id: 'deepseek/deepseek-reasoner', name: 'DeepSeek R1', reasoning: true, contextWindow: 64000, maxTokens: 8192 },
+            { id: 'google/gemini-2.5-flash-lite', name: 'Gemini Flash Lite', contextWindow: 128000, maxTokens: 8192 },
+            { id: 'google/gemini-3-flash', name: 'Gemini 3 Flash', input: ['text', 'image'], contextWindow: 128000, maxTokens: 8192 },
+        ],
+    };
+
+    config.agents = config.agents || {};
+    config.agents.defaults = config.agents.defaults || {};
+
+    // Primary model: Opus for heavy reasoning, fallbacks for resilience
+    config.agents.defaults.model = {
+        primary: 'openrouter/anthropic/claude-opus-4-5',
+        fallbacks: [
+            'openrouter/deepseek/deepseek-reasoner',
+            'openrouter/google/gemini-3-flash',
+        ],
+    };
+
+    // Model aliases for /model command
+    config.agents.defaults.models = {
+        'openrouter/anthropic/claude-opus-4-5': { alias: 'opus' },
+        'openrouter/anthropic/claude-sonnet-4-5': { alias: 'sonnet' },
+        'openrouter/google/gemini-3-flash': { alias: 'flash' },
+        'openrouter/deepseek/deepseek-reasoner': { alias: 'ds' },
+    };
+
+    // Cheap model for periodic heartbeats
+    config.agents.defaults.heartbeat = {
+        every: '30m',
+        model: 'openrouter/google/gemini-2.5-flash-lite',
+        target: 'last',
+    };
+
+    // Cost-effective model for sub-agents
+    config.agents.defaults.subagents = {
+        model: 'openrouter/deepseek/deepseek-reasoner',
+        maxConcurrent: 1,
+        archiveAfterMinutes: 60,
+    };
+
+    // Vision tasks use a multimodal model
+    config.agents.defaults.imageModel = {
+        primary: 'openrouter/google/gemini-3-flash',
+        fallbacks: ['openrouter/anthropic/claude-sonnet-4-5'],
+    };
+
+    config.agents.defaults.contextTokens = 200000;
+
+    console.log('OpenRouter multi-model config applied: primary=opus, heartbeat=gemini-flash-lite, subagents=deepseek-reasoner');
 }
 
 // Telegram configuration

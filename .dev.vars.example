@@ -4,6 +4,7 @@
 # AI Provider (at least one required)
 ANTHROPIC_API_KEY=sk-ant-...
 # OPENAI_API_KEY=sk-...
+# OPENROUTER_API_KEY=sk-or-v1-...  # Multi-model routing via OpenRouter (overrides direct keys)
 
 # Cloudflare AI Gateway (alternative to direct provider keys)
 # CLOUDFLARE_AI_GATEWAY_API_KEY=your-provider-api-key

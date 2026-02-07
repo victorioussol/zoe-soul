@@ -21,6 +21,12 @@ describe('buildEnvVars', () => {
     expect(result.OPENAI_API_KEY).toBe('sk-openai-key');
   });
 
+  it('includes OPENROUTER_API_KEY when set', () => {
+    const env = createMockEnv({ OPENROUTER_API_KEY: 'sk-or-v1-test-key' });
+    const result = buildEnvVars(env);
+    expect(result.OPENROUTER_API_KEY).toBe('sk-or-v1-test-key');
+  });
+
   // Cloudflare AI Gateway (new native provider)
   it('passes Cloudflare AI Gateway env vars', () => {
     const env = createMockEnv({
