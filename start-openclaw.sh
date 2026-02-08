@@ -335,6 +335,23 @@ if (config.tools.web.fetch.enabled === undefined) {
     config.tools.web.fetch.enabled = true;
 }
 
+// Google Workspace MCP server (Gmail, Calendar, Drive/Sheets)
+// Registers the MCP server so OpenClaw agents can use Google tools.
+// Scopes: gmail.readonly, calendar.events, calendar.readonly, drive.readonly
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
+    config.mcpServers = config.mcpServers || {};
+    config.mcpServers['google-workspace'] = {
+        command: 'npx',
+        args: ['-y', 'mcp-server-google-workspace'],
+        env: {
+            GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+            GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+            GOOGLE_REFRESH_TOKEN: process.env.GOOGLE_REFRESH_TOKEN,
+        },
+    };
+    console.log('Google Workspace MCP server configured (Gmail, Calendar, Drive)');
+}
+
 // Telegram configuration
 // Overwrite entire channel object to drop stale keys from old R2 backups
 // that would fail OpenClaw's strict config validation (see #47)

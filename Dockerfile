@@ -25,6 +25,10 @@ RUN npm install -g pnpm
 RUN npm install -g openclaw@2026.2.3 \
     && openclaw --version
 
+# Install MCP server for Google Workspace (Gmail, Calendar, Drive/Sheets)
+# Pre-installed globally so npx doesn't need to download on every container start
+RUN npm install -g mcp-server-google-workspace
+
 # Create OpenClaw directories
 # Legacy .clawdbot paths are kept for R2 backup migration
 RUN mkdir -p /root/.openclaw \
@@ -33,7 +37,7 @@ RUN mkdir -p /root/.openclaw \
 
 # Copy startup script
 # Cache bust: changing ARG value forces rebuild of all layers below
-ARG CACHE_BUST=2026-02-08-v35-brave-search-web-tools
+ARG CACHE_BUST=2026-02-08-v36-google-workspace-mcp
 COPY start-openclaw.sh /usr/local/bin/start-openclaw.sh
 RUN chmod +x /usr/local/bin/start-openclaw.sh
 

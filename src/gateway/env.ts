@@ -49,6 +49,9 @@ export function buildEnvVars(env: MoltbotEnv): Record<string, string> {
   if (env.CF_AI_GATEWAY_MODEL) envVars.CF_AI_GATEWAY_MODEL = env.CF_AI_GATEWAY_MODEL;
   if (env.CF_ACCOUNT_ID) envVars.CF_ACCOUNT_ID = env.CF_ACCOUNT_ID;
   if (env.BRAVE_API_KEY) envVars.BRAVE_API_KEY = env.BRAVE_API_KEY;
+  if (env.GOOGLE_CLIENT_ID) envVars.GOOGLE_CLIENT_ID = env.GOOGLE_CLIENT_ID;
+  if (env.GOOGLE_CLIENT_SECRET) envVars.GOOGLE_CLIENT_SECRET = env.GOOGLE_CLIENT_SECRET;
+  if (env.GOOGLE_REFRESH_TOKEN) envVars.GOOGLE_REFRESH_TOKEN = env.GOOGLE_REFRESH_TOKEN;
   if (env.CDP_SECRET) envVars.CDP_SECRET = env.CDP_SECRET;
   if (env.WORKER_URL) envVars.WORKER_URL = env.WORKER_URL;
 
