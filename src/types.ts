@@ -42,7 +42,7 @@ export interface MoltbotEnv {
   CF_ACCOUNT_ID?: string; // Cloudflare account ID for R2 endpoint
   // Brave Search API key (for built-in web_search tool)
   BRAVE_API_KEY?: string;
-  // Google Workspace OAuth credentials (for MCP server: Gmail, Calendar, Drive/Sheets)
+  // Google Workspace OAuth credentials (for google-workspace skill: Gmail, Calendar, Drive/Sheets)
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
   GOOGLE_REFRESH_TOKEN?: string;

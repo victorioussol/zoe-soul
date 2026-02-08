@@ -381,20 +381,6 @@ console.log('Configuration patched successfully');
 EOFPATCH
 
 # ============================================================
-# REGISTER MCP SERVERS
-# ============================================================
-# Use openclaw mcp add CLI to register MCP servers.
-# This modifies the config file directly in a way OpenClaw expects.
-
-if [ -n "$GOOGLE_CLIENT_ID" ] && [ -n "$GOOGLE_CLIENT_SECRET" ] && [ -n "$GOOGLE_REFRESH_TOKEN" ]; then
-    echo "Registering Google Workspace MCP server..."
-    # Remove first to avoid duplicates from R2 backup restore
-    openclaw mcp remove google-workspace 2>/dev/null || true
-    openclaw mcp add --transport stdio google-workspace -- npx -y mcp-server-google-workspace
-    echo "Google Workspace MCP server registered"
-fi
-
-# ============================================================
 # START GATEWAY
 # ============================================================
 echo "Starting OpenClaw Gateway..."
