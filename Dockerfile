@@ -26,7 +26,9 @@ RUN npm install -g openclaw@2026.2.3 \
     && openclaw --version
 
 # Install Google APIs SDK (used by google-workspace skill scripts)
+# Set NODE_PATH so require('googleapis') resolves from any script location
 RUN npm install -g googleapis
+ENV NODE_PATH=/usr/local/lib/node_modules
 
 # Create OpenClaw directories
 # Legacy .clawdbot paths are kept for R2 backup migration
@@ -36,7 +38,7 @@ RUN mkdir -p /root/.openclaw \
 
 # Copy startup script
 # Cache bust: changing ARG value forces rebuild of all layers below
-ARG CACHE_BUST=2026-02-08-v41-remove-skills-entries-config
+ARG CACHE_BUST=2026-02-08-v42-fix-node-path-for-googleapis
 COPY start-openclaw.sh /usr/local/bin/start-openclaw.sh
 RUN chmod +x /usr/local/bin/start-openclaw.sh
 
