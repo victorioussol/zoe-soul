@@ -335,6 +335,23 @@ if (config.tools.web.fetch.enabled === undefined) {
     config.tools.web.fetch.enabled = true;
 }
 
+// Google Workspace skill configuration
+// Register the skill entry with env vars so OpenClaw injects them into agent runs.
+// The skill's metadata.moltbot.requires.env gates it on these vars being present.
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
+    config.skills = config.skills || {};
+    config.skills.entries = config.skills.entries || {};
+    config.skills.entries['google-workspace'] = {
+        enabled: true,
+        env: {
+            GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+            GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+            GOOGLE_REFRESH_TOKEN: process.env.GOOGLE_REFRESH_TOKEN,
+        },
+    };
+    console.log('Google Workspace skill configured with OAuth credentials');
+}
+
 // Telegram configuration
 // Overwrite entire channel object to drop stale keys from old R2 backups
 // that would fail OpenClaw's strict config validation (see #47)
