@@ -37,7 +37,7 @@ RUN mkdir -p /root/.openclaw \
 
 # Copy startup script
 # Cache bust: changing ARG value forces rebuild of all layers below
-ARG CACHE_BUST=2026-02-08-v36-google-workspace-mcp
+ARG CACHE_BUST=2026-02-08-v37-fix-mcp-registration-via-cli
 COPY start-openclaw.sh /usr/local/bin/start-openclaw.sh
 RUN chmod +x /usr/local/bin/start-openclaw.sh
 

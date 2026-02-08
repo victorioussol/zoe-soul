@@ -335,23 +335,6 @@ if (config.tools.web.fetch.enabled === undefined) {
     config.tools.web.fetch.enabled = true;
 }
 
-// Google Workspace MCP server (Gmail, Calendar, Drive/Sheets)
-// Registers the MCP server so OpenClaw agents can use Google tools.
-// Scopes: gmail.readonly, calendar.events, calendar.readonly, drive.readonly
-if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REFRESH_TOKEN) {
-    config.mcpServers = config.mcpServers || {};
-    config.mcpServers['google-workspace'] = {
-        command: 'npx',
-        args: ['-y', 'mcp-server-google-workspace'],
-        env: {
-            GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-            GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-            GOOGLE_REFRESH_TOKEN: process.env.GOOGLE_REFRESH_TOKEN,
-        },
-    };
-    console.log('Google Workspace MCP server configured (Gmail, Calendar, Drive)');
-}
-
 // Telegram configuration
 // Overwrite entire channel object to drop stale keys from old R2 backups
 // that would fail OpenClaw's strict config validation (see #47)
@@ -396,6 +379,20 @@ if (process.env.SLACK_BOT_TOKEN && process.env.SLACK_APP_TOKEN) {
 fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
 console.log('Configuration patched successfully');
 EOFPATCH
+
+# ============================================================
+# REGISTER MCP SERVERS
+# ============================================================
+# Use openclaw mcp add CLI to register MCP servers.
+# This modifies the config file directly in a way OpenClaw expects.
+
+if [ -n "$GOOGLE_CLIENT_ID" ] && [ -n "$GOOGLE_CLIENT_SECRET" ] && [ -n "$GOOGLE_REFRESH_TOKEN" ]; then
+    echo "Registering Google Workspace MCP server..."
+    # Remove first to avoid duplicates from R2 backup restore
+    openclaw mcp remove google-workspace 2>/dev/null || true
+    openclaw mcp add --transport stdio google-workspace -- npx -y mcp-server-google-workspace
+    echo "Google Workspace MCP server registered"
+fi
 
 # ============================================================
 # START GATEWAY
