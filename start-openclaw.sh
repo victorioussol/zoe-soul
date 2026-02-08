@@ -313,6 +313,28 @@ if (process.env.OPENROUTER_API_KEY) {
     console.log('OpenRouter multi-model config applied: primary=gemini-2.5-flash, heartbeat=gemini-flash-lite, subagents=deepseek-r1');
 }
 
+// Brave Search web tool configuration
+// OpenClaw has a built-in web_search tool that uses Brave Search API.
+// When BRAVE_API_KEY is set, enable it and store the key in config.
+if (process.env.BRAVE_API_KEY) {
+    config.tools = config.tools || {};
+    config.tools.web = config.tools.web || {};
+    config.tools.web.search = config.tools.web.search || {};
+    config.tools.web.search.enabled = true;
+    config.tools.web.search.provider = 'brave';
+    config.tools.web.search.apiKey = process.env.BRAVE_API_KEY;
+    config.tools.web.search.maxResults = 5;
+    console.log('Brave Search web tool configured');
+}
+
+// Enable web_fetch tool (URL fetching + readable extraction) by default
+config.tools = config.tools || {};
+config.tools.web = config.tools.web || {};
+config.tools.web.fetch = config.tools.web.fetch || {};
+if (config.tools.web.fetch.enabled === undefined) {
+    config.tools.web.fetch.enabled = true;
+}
+
 // Telegram configuration
 // Overwrite entire channel object to drop stale keys from old R2 backups
 // that would fail OpenClaw's strict config validation (see #47)
