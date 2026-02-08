@@ -256,12 +256,12 @@ if (process.env.OPENROUTER_API_KEY) {
         apiKey: orKey,
         api: 'openai-completions',
         models: [
-            { id: 'anthropic/claude-opus-4-5', name: 'Claude Opus', contextWindow: 200000, maxTokens: 8192 },
-            { id: 'anthropic/claude-sonnet-4-5', name: 'Claude Sonnet', contextWindow: 200000, maxTokens: 8192 },
-            { id: 'deepseek/deepseek-chat', name: 'DeepSeek V3', contextWindow: 64000, maxTokens: 8192 },
-            { id: 'deepseek/deepseek-reasoner', name: 'DeepSeek R1', reasoning: true, contextWindow: 64000, maxTokens: 8192 },
-            { id: 'google/gemini-2.5-flash-lite', name: 'Gemini Flash Lite', contextWindow: 128000, maxTokens: 8192 },
-            { id: 'google/gemini-2.5-flash', name: 'Gemini 2.5 Flash', input: ['text', 'image'], contextWindow: 1000000, maxTokens: 8192 },
+            { id: 'anthropic/claude-opus-4-5', name: 'Claude Opus', contextWindow: 200000, maxTokens: 4096 },
+            { id: 'anthropic/claude-sonnet-4-5', name: 'Claude Sonnet', contextWindow: 200000, maxTokens: 4096 },
+            { id: 'deepseek/deepseek-chat', name: 'DeepSeek V3', contextWindow: 64000, maxTokens: 4096 },
+            { id: 'deepseek/deepseek-reasoner', name: 'DeepSeek R1', reasoning: true, contextWindow: 64000, maxTokens: 4096 },
+            { id: 'google/gemini-2.5-flash-lite', name: 'Gemini Flash Lite', contextWindow: 128000, maxTokens: 4096 },
+            { id: 'google/gemini-2.5-flash', name: 'Gemini 2.5 Flash', input: ['text', 'image'], contextWindow: 1000000, maxTokens: 4096 },
         ],
     };
 
@@ -274,7 +274,7 @@ if (process.env.OPENROUTER_API_KEY) {
         primary: 'openrouter/google/gemini-2.5-flash',
         fallbacks: [
             'openrouter/deepseek/deepseek-chat',
-            'openrouter/anthropic/claude-sonnet-4-5',
+            'openrouter/google/gemini-2.5-flash-lite',
         ],
     };
 
@@ -305,7 +305,7 @@ if (process.env.OPENROUTER_API_KEY) {
     // Vision tasks use a multimodal model
     config.agents.defaults.imageModel = {
         primary: 'openrouter/google/gemini-2.5-flash',
-        fallbacks: ['openrouter/anthropic/claude-sonnet-4-5'],
+        fallbacks: ['openrouter/deepseek/deepseek-chat'],
     };
 
     config.agents.defaults.contextTokens = 128000;
